@@ -1,0 +1,59 @@
+enum Estado = Vivo | Muerto
+
+struct Celula = Celula {
+    estado: Estado,
+    x: Integet,
+    y: Integer
+}
+
+def vecinos(tablero: Matriz, celula: Celula): [Celula] { ... }
+
+def celulasVivas(celulas: [Celula]): Int { ... }
+
+def actualizarCelula(vecinos : [Celula], celula : Celula): () {
+    let vecinosVivos = celulasVivas(vecinos)
+    
+    case celula.estado of
+        Muerta -> celula.estado = if vecinosVivos == 3 then Viva else Muerta
+        Viva   -> celula.estado = if vecinosVivos == 2 || vecinosVivos == 3 then Viva else Muerta 
+}
+
+def tableroAleatorio(size: Integer): Matriz[Celula] { ... }
+
+# Funciones paralelas
+
+def calcularDesplazamientos(): [Desplazamiento] { ... }
+
+def calcularFilasPorProcesador(): [Cantidad] { ... }
+
+def mpi_scatterv(fuente: A, cantidades: [Cantidad], desplazamientos: [Desplazamiento], destino: A): () { ... }
+
+def mpi_gatherv(fuente: A, cantidades: [Cantidad], desplazamientos: [Desplazamiento], destino: A): () { ... }
+
+def main(): () {
+    let N = 500
+    let iteraciones = 1_000_000
+    let tablero = tableroAleatorio(N, N)
+    let filasPorProc = calcularFilasPorProcesador()
+    let desplazamientos = calcularDesplazamientos()
+
+    repeat (iteraciones) {
+        let filas
+        
+        # Se copia parte del tablero a cada proceso
+        mpi_scatterv(tablero, filasPorProc, desplazamientos, filas)
+        
+        # Se hace una copia del las filas
+        let nuevasFilas = copy(filas)
+        
+        for (celula in nuevasFilas) {
+            let vecinos = vecinos(filas, celula)
+        
+            # Se actualiza cada celula de las filas, manteniendo correctos los datos de los vecinos
+            actualizarCelula(vecinos, celula)
+        }
+
+        # El proceso maestro actualiza el tablero con la union de las filas
+        mpi_gatherv(nuevasFilas, filasPorProc, desplazamientos, tablero)
+    }
+}

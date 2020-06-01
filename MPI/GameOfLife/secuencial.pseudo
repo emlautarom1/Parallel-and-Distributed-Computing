@@ -1,0 +1,41 @@
+enum Estado = Vivo | Muerto
+
+struct Celula = Celula {
+    estado: Estado,
+    x: Integet,
+    y: Integer
+}
+
+def vecinos(tablero: Matriz, celula: Celula): [Celula] { ... }
+
+def celulasVivas(celulas: [Celula]): Int { ... }
+
+def actualizarCelula(vecinos : [Celula], celula : Celula): () {
+    let vecinosVivos = celulasVivas(vecinos)
+    
+    case celula.estado of
+        Muerta -> celula.estado = if vecinosVivos == 3 then Viva else Muerta
+        Viva   -> celula.estado = if vecinosVivos == 2 || vecinosVivos == 3 then Viva else Muerta 
+}
+
+def tableroAleatorio(size: Integer): Matriz[Celula] { ... }
+
+def main(): () {
+    let N = 500
+    let iteraciones = 1_000_000
+    let tablero = tableroAleatorio(N, N)
+
+    repeat (iteraciones) {
+        # Se hace una copia del tablero actual
+        let nuevoTablero = copy(tablero)
+        
+        for (celula in nuevoTablero) {
+            let vecinos = vecinos(tablero, celula)
+            # Se actualiza cada celula del nuevoTablero, manteniendo correctos los datos de los vecinos
+            actualizarCelula(vecinos, celula)
+        }
+
+        # Se actualiza el tablero con el nuevoTablero
+        tablero = nuevoTablero
+    }
+}
