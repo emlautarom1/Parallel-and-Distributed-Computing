@@ -16,4 +16,4 @@ En caso de que el ejercicio requiera de alguna justificación textual la misma s
 
 ---
 
-Desarrollado y ejecutado en `elementary OS 5.1.4 Hera x86_64`, variante de `Ubuntu LTS 18.04 x86_64`
+Desarrollado y ejecutado en `elementary OS 5.1.4 Hera x86_64`, variante de `Ubuntu LTS 18.04 x86_64`, con Ryzen 5 3600 3.6 Ghz (6-Core 12 Thread), 16 GB DDR4
